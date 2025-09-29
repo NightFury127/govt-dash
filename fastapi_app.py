@@ -63,6 +63,19 @@ async def root_index():
 		return FileResponse("index.html")
 	return {"status": "ok"}
 
+# Root-level static assets expected by index.html
+@app.get("/app.js")
+async def serve_app_js():
+	if os.path.exists("app.js"):
+		return FileResponse("app.js")
+	raise HTTPException(status_code=404, detail="app.js not found")
+
+@app.get("/style.css")
+async def serve_style_css():
+	if os.path.exists("style.css"):
+		return FileResponse("style.css")
+	raise HTTPException(status_code=404, detail="style.css not found")
+
 @app.post("/api/send-amendment")
 async def send_amendment(payload: SendAmendmentPayload, _: None = Depends(require_api_key)):
 	if not payload.amendmentName:
