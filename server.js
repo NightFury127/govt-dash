@@ -31,8 +31,17 @@ const API_KEY = "sk-2b8e1e7c-4f7a-4e2a-9c1e-8d2e7b1a6f3c"; // Change this to you
 
 // API key middleware for /api/ routes
 app.use((req, res, next) => {
+  // Allow CORS preflight to pass
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
   if (req.path.startsWith("/api/")) {
-    const key = req.headers["x-api-key"];
+    // Accept API key from header OR query param for browser-friendly links
+    const keyFromHeader = req.headers["x-api-key"];
+    const keyFromQuery = req.query.api_key || req.query.key;
+    const key = keyFromHeader || keyFromQuery;
+
     if (key !== API_KEY) {
       return res.status(401).json({ error: "Unauthorized: Invalid API key" });
     }
